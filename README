@@ -1,0 +1,14 @@
+This is the source code for EarthDemSim, a game for the Arduino.
+The display is a MAX7219-based 8x8 red LED matrix display from
+Deal Extreme (SKU #184854), and the game is controlled by an
+old NES controller. There's no sound (yet). Pin connections
+between Arduino, display and controller are shown in the source
+code comments.
+
+I wrote this game for Ludum Dare's MiniLD #42: 
+
+http://www.ludumdare.com/compo/2013/05/18/mini-ludum-dare-42-announcement/
+
+The game is an Earth Demolition Simulator, wherein the player
+shoots at the Earth from a spaceship. All implemented in 2k
+of RAM on the arduino, and 64 pixels on the display.
