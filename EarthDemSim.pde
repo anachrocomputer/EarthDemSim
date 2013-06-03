@@ -235,8 +235,8 @@ int runLevel (void)
       if (missileCollision ())
         Missile.y = MAXY;
     }
-    else if (nesbits & NES_A) {
-      Missile.x = Playerx;
+    else if (nesbits & (NES_A | NES_B)) { // A or B buttons both fire, for
+      Missile.x = Playerx;                // ease of use with FlightGrip 2
       Missile.y = 1;
     }
     
