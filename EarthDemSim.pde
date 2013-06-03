@@ -79,6 +79,18 @@ unsigned char WinIcon[8][8] = {
   {0, 0, 1, 1, 1, 1, 0, 0}
 };
 
+// Slightly less inefficiently coded icon for losing
+unsigned char LoseIcon[8][8] = {
+  {4, 3, 0, 0, 0, 0, 3, 4},
+  {4, 3, 2, 0, 0, 2, 3, 4},
+  {3, 3, 2, 1, 1, 2, 3, 3},
+  {2, 2, 2, 1, 1, 2, 2, 2},
+  {0, 1, 1, 1, 1, 1, 1, 0},
+  {0, 1, 1, 1, 1, 1, 1, 0},
+  {2, 2, 2, 0, 0, 2, 2, 2},
+  {3, 3, 0, 0, 0, 0, 3, 3}
+};
+
 struct {
   int x, y;
 } Missile;
@@ -164,6 +176,8 @@ void runGame (void)
     
     if (won)
       break;
+    else
+      showLoseShip ();
   }
   
   if (won)
@@ -287,7 +301,7 @@ int runLevel (void)
       delay (40 - elapsed);
   }
   
-  delay (1000);
+  delay (500);
   
   return (won);
 }
@@ -311,6 +325,35 @@ void showWin (void)
   updscreen ();
   
   delay (4000);
+}
+
+
+/* showLoseShip --- display lose-a-ship animation */
+
+void showLoseShip (void)
+{
+  int x, y;
+  int frame;
+
+  for (frame = 1; frame <= 4; frame++) {
+    clrFrame ();
+    
+    for (x = 0; x < MAXX; x++) {
+      for (y = 0 ; y < MAXY; y++) {
+        if (LoseIcon[y][x] == frame)
+          setPixel (x, 7 - y);
+      }
+    }
+    
+    updscreen ();
+    
+    delay (300);
+  }
+  
+  clrFrame ();
+  updscreen ();
+  
+  delay (500);
 }
 
 

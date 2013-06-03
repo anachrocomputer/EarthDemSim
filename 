@@ -1,0 +1,17 @@
+commit d174d7023a95f788bc8020490620c246379b5a04
+Author: John Honniball <coredump@gifford.co.uk>
+Date:   Mon Jun 3 21:09:43 2013 +0100
+
+    Made A and B buttons both fire, for ease of use with QuickShot FlightGrip 2 controller.
+
+commit b05127ccb75aad23d92bd10b4f1e48375a812490
+Author: John Honniball <coredump@gifford.co.uk>
+Date:   Fri May 31 10:20:38 2013 +0100
+
+    Added README text.
+
+commit 6941336eaf78e4be787d68d9e2828b65a83b47e3
+Author: John Honniball <coredump@gifford.co.uk>
+Date:   Fri May 31 08:43:08 2013 +0100
+
+    Initial coding.
