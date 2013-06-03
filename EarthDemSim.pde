@@ -175,16 +175,29 @@ void runGame (void)
 
 void showShips (int ships)
 {
-  int i;
+  int f, s;
   
-  clrFrame ();
-  
-  for (i = 0; i < ships; i++)
-    drawPlayer (6, i * 3);
+  // The ship that is about to play will blink on and off
+  for (f = 0; f < 5; f++) {
+    clrFrame ();
     
-  updscreen ();
+    for (s = 0; s < ships; s++)
+      drawPlayer (6, s * 3);
+    
+    updscreen ();
   
-  delay (1000);
+    delay (200);
+    
+    clrFrame ();
+    
+    for (s = 0; s < (ships - 1); s++)
+      drawPlayer (6, s * 3);
+    
+    updscreen ();
+  
+    delay (100);
+  }
+    
 }
 
 
