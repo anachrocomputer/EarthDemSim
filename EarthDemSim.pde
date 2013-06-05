@@ -225,9 +225,11 @@ int runLevel (void)
   int playing = true;
   int frame = 0;
   unsigned int nesbits;
+  int earthSpeed;
   int won = 0;
   
   Earthy = 8;  // Earth just off-screen
+  earthSpeed = 25;  // Earth moves every 25 frames, 1 second
   Playerpos = 2;
   Playerx = Playerpos / 2;
   Missile.x = Playerx;
@@ -274,12 +276,17 @@ int runLevel (void)
     }
       
     // Earth moves one pixel closer every 25 frames (1 sec)
-    if ((frame % 25) == 0)
+    if ((frame % earthSpeed) == 0)
       Earthy--;
     
     // If we allow the Earth to pass by, re-set it
     if (Earthy < -10) {
       Serial.println ("Earth passed by, re-targeting!");
+      earthSpeed = (earthSpeed * 4) / 5;
+      
+      if (earthSpeed < 2)
+        earthSpeed = 1;
+        
       Earthy = 8;
     }
       
