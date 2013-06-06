@@ -48,6 +48,7 @@
 #define MAXY 8
 #define MAXROWS 8
 
+
 // The pixel buffer, 8 bytes
 unsigned char FrameBuffer[MAXY];
 
@@ -279,6 +280,11 @@ int runLevel (void)
     if ((frame % earthSpeed) == 0)
       Earthy--;
     
+    if (earthCollision ()) {
+      Serial.println ("Your ship struck the Earth!");
+      playing = 0;
+    }
+
     // If we allow the Earth to pass by, re-set it
     if (Earthy < -10) {
       Serial.println ("Earth passed by, re-targeting!");
@@ -286,15 +292,11 @@ int runLevel (void)
       
       if (earthSpeed < 2)
         earthSpeed = 1;
-        
+      
+      turnEarth90 ();
       Earthy = 8;
     }
-      
-    if (earthCollision ()) {
-      Serial.println ("Your ship struck the Earth!");
-      playing = 0;
-    }
-      
+        
     frame++;
     
     // Work out timing for this frame
@@ -463,6 +465,36 @@ int earthCollision (void)
 }
 
 
+/* turnEarth90 --- rotate pixel map for Earth by 90 degrees */
+
+void turnEarth90 (void)
+{
+  // We need to rotate 'EarthMap' by 90 degrees, but we don't want to
+  // use a temporary 64-byte array. We do it by combining two reflections
+  // which can be done in-place.
+  int i, j;
+  unsigned char temp;
+  
+  // First, we reflect in Y=X
+  for (i = 0; i < (MAXX - 1); i++) {
+    for (j = i + 1; j < MAXX; j++) {
+      temp = EarthMap[i][j];
+      EarthMap[i][j] = EarthMap[j][i];
+      EarthMap[j][i] = temp;
+    }
+  }
+  
+  // Now, reflect about X mid-point
+  for (i = 0; i < MAXY; i++) {
+    for (j = 0; j < (MAXX / 2); j++) {
+      temp = EarthMap[i][j];
+      EarthMap[i][j] = EarthMap[i][7 -j];
+      EarthMap[i][7 - j] = temp;
+    }
+  }
+}
+
+
 /* readNES --- read the NES controller */
 
 unsigned int readNES (void)
@@ -512,7 +544,7 @@ void drawEarth (void)
   
   if ((Earthy > 7) || (Earthy < -7))
     return;  // Earth is off-screen
-    
+  
   for (x = 0; x < MAXX; x++) {
     ys = max (Earthy, 0);
     ye = max (-Earthy, 0);
