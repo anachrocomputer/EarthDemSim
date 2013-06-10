@@ -11,7 +11,7 @@ http://www.ludumdare.com/compo/2013/05/18/mini-ludum-dare-42-announcement/
 
 The game is an Earth Demolition Simulator, wherein the player
 shoots at the Earth from a spaceship. All implemented in 2k
-of RAM on the arduino, and 64 pixels on the display.
+of RAM on the Arduino, and 64 pixels on the display.
 
 On Github, there are two branches, "master" and "minild42". "minild42"
 is the original code that I wrote for the MiniLD42 contest on Ludum
