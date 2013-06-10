@@ -13,7 +13,7 @@ The game is an Earth Demolition Simulator, wherein the player
 shoots at the Earth from a spaceship. All implemented in 2k
 of RAM on the arduino, and 64 pixels on the display.
 
-On Github, thee are two branches, "master" and "minild42". "minild42"
+On Github, there are two branches, "master" and "minild42". "minild42"
 is the original code that I wrote for the MiniLD42 contest on Ludum
 Dare. "master" is an updated branch that includes improvements that
 I've added after the game deadline. I'm still adding new stuff to the
