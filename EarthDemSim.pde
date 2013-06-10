@@ -723,6 +723,8 @@ void max7219_begin (void)
   SPI.setDataMode (SPI_MODE0);
   
   /* Start configuring the MAX7219 LED controller */
+  max7219write (DISPLAYTEST_REG, 0); // Switch off display test mode
+  
   max7219write (SHUTDOWN_REG, 1);   // Exit shutdown
 
   max7219write (INTENSITY_REG, 7);  // Brightness half
