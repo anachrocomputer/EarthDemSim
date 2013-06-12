@@ -17,6 +17,12 @@
 #define CLOCK_PIN    3
 #define DATA_PIN     4
 
+#define NESOUT       PORTD
+#define NESIN        PIND
+#define LATCH_BIT    (1 << LATCH_PIN)
+#define CLOCK_BIT    (1 << CLOCK_PIN)
+#define DATA_BIT     (1 << DATA_PIN)
+
 // Connections to MAX7219 via SPI port on AVR chip
 // I'm actually using a ready-made MAX7219 board and red LED
 // matrix display, Deal Extreme (dx.com) SKU #184854
@@ -499,9 +505,15 @@ void turnEarth90 (void)
 
 unsigned int readNES (void)
 {
+  // With digitalRead/digitalWrite: 150us
+  // With direct port I/O: 24us
+//unsigned long int before, after;
   unsigned int nesbits = 0;
   int i;
   
+//before = micros ();
+  
+#ifdef SLOW_READNES
   digitalWrite (LATCH_PIN, HIGH);
   digitalWrite (LATCH_PIN, LOW);
   
@@ -512,6 +524,27 @@ unsigned int readNES (void)
     digitalWrite (CLOCK_PIN, HIGH);
     digitalWrite (CLOCK_PIN, LOW);
   }
+#else
+  NESOUT |= LATCH_BIT;
+  delayMicroseconds (1);
+  NESOUT &= ~LATCH_BIT;
+  
+  for (i = 0; i < 8; i++) {
+    delayMicroseconds (1);
+    
+    if ((NESIN & DATA_BIT) == 0)
+      nesbits |= (1 << i);
+      
+    NESOUT |= CLOCK_BIT;
+    delayMicroseconds (1);
+    NESOUT &= ~CLOCK_BIT;
+  }
+#endif
+  
+//after = micros ();
+//Serial.print ("readNES: ");
+//Serial.print (after - before, DEC);
+//Serial.println ("us");
   
   return (nesbits);
 }
