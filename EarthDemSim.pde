@@ -252,7 +252,7 @@ int runLevel (void)
     
     drawMissile ();
     
-    drawEarth ();
+    drawEarth (frame);
         
     updscreen ();
     
@@ -433,11 +433,15 @@ int missileCollision (void)
     EarthMap[y][Missile.x] = 0;
     break;
   case 3:  // Inner Mantle
-    EarthMap[y][Missile.x] = 2; // Takes two shots to destroy
+    EarthMap[y][Missile.x] = 5; // Takes two shots to destroy
     break;
   case 4:  // Core
     EarthMap[y][Missile.x] = 0;
     break;
+  case 5:  // Inner Mantle, hit once (flickering)
+    EarthMap[y][Missile.x] = 0;
+    break;
+
   }
   
   return (1);
@@ -570,7 +574,7 @@ void drawMissile (void)
 
 /* drawEarth --- draw the Earth approaching from top */
 
-void drawEarth (void)
+void drawEarth (int frame)
 {
   int x;
   int ye, ys;
@@ -582,8 +586,14 @@ void drawEarth (void)
     ys = max (Earthy, 0);
     ye = max (-Earthy, 0);
     for ( ; (ye < MAXY) && (ys < MAXY); ye++, ys++) {
-      if (EarthMap[ye][x] != 0)
-        setPixel (x, ys);
+      if (EarthMap[ye][x] != 0) {
+        if (EarthMap[ye][x] == 5) {
+          if (frame & 1)       // Draw on alternate frames
+            setPixel (x, ys);  // for flicker effect
+        }
+        else
+          setPixel (x, ys);
+      }
     }
   }
 }
