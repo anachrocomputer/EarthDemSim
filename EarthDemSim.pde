@@ -114,6 +114,7 @@ struct {
   int x, y;
 } Missile;
 
+int Brightness = 7; // LED matrix display brightness
 int Playerpos;   // Player position 0..15
 int Playerx;     // Player X, 0..7
 int Earthy;
@@ -175,6 +176,15 @@ void waitReady (void)
   
   do {
     nesbits = readNES ();
+    
+    // Allow brightness adjustment while waiting for START
+    if ((nesbits & NES_N) && (Brightness < 15))
+      max7219write (INTENSITY_REG, ++Brightness);
+    
+    if ((nesbits & NES_S) && (Brightness > 0))
+      max7219write (INTENSITY_REG, --Brightness);
+    
+    delay (100);
   } while ((nesbits & NES_START) == 0);
 }
 
