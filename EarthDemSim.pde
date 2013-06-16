@@ -4,6 +4,7 @@
 /* Released under the GNU Public Licence (GPL) */
 
 #include <SPI.h>
+#include <Wire.h>
 
 // Direct port I/O defines for Arduino with ATmega328
 // Change these if running on Mega Arduino
@@ -29,6 +30,9 @@
 #define slaveSelectPin 10  // CS pin
 #define SDAPin 11          // DIN pin
 #define SCLKPin 13         // CLK pin
+
+// I2C address of SAA1064 LED driver chip
+#define SAA1064_ADDR (56)
 
 // Bits returned by 'readNES':
 #define NES_A        1
@@ -109,6 +113,29 @@ unsigned char LoseIcon[8][8] = {
   {0, 0, 1, 1, 1, 1, 0, 0}
 };
 
+#define A (1 << 0)
+#define B (1 << 1)
+#define C (1 << 2)
+#define D (1 << 3)
+#define E (1 << 4)
+#define F (1 << 5)
+#define G (1 << 6)
+#define DP (1 << 7)
+
+// Table of seven-segment digits 0-9
+unsigned char Segtab[10] = {
+  A | B | C | D | E | F,     // 0
+  D | E,                     // 1
+  A | C | D | F | G,         // 2
+  C | D | E | F | G,         // 3
+  B | D | E | G,             // 4
+  B | C | E | F | G,         // 5
+  A | B | C | E | F | G,     // 6
+  C | D | E,                 // 7
+  A | B | C | D | E | F | G, // 8
+  B | C | D | E | F | G      // 9
+};
+
 
 struct {
   int x, y;
@@ -118,7 +145,7 @@ int Brightness = 7; // LED matrix display brightness
 int Playerpos;   // Player position 0..15
 int Playerx;     // Player X, 0..7
 int Earthy;
-
+int Score;
 
 void setup (void)
 {
@@ -145,6 +172,10 @@ void setup (void)
   clrFrame ();
   
   updscreen ();
+  
+  saa1064_begin ();
+  
+  setleds (0);
   
   // Wait one second
   delay (1000);
@@ -197,6 +228,9 @@ void runGame (void)
   int won;
   
   memcpy (EarthMap, Earth8x8, sizeof (EarthMap));  // Refresh Earth
+  
+  Score = 0;
+  setleds (Score);
   
   for (ship = 3; ship > 0; ship--) {
     showShips (ship);
@@ -292,8 +326,11 @@ int runLevel (void)
     // Move the missile, or fire a new one
     if (Missile.y < MAXY) {
       Missile.y++;
-      if (missileCollision ())
+      if (missileCollision ()) {
         Missile.y = MAXY;
+        Score += 15;
+        setleds (Score);
+      }
     }
     else if (nesbits & (NES_A | NES_B)) { // A or B buttons both fire, for
       Missile.x = Playerx;                // ease of use with FlightGrip 2
@@ -852,3 +889,69 @@ void max7219write (unsigned char reg, unsigned char val)
   LEDOUT |= CS;     //  digitalWrite (slaveSelectPin, HIGH);
 }
 
+
+/* saa1064_begin --- set up the SAA1064 I2C LED driver */
+
+void saa1064_begin (void)
+{
+  int i, b;
+  
+  Wire.begin ();
+  
+  Wire.beginTransmission (SAA1064_ADDR);
+  Wire.send (0);
+  Wire.send (0x67);  // Mux mode, digits unblanked
+  Wire.endTransmission ();
+  
+#ifdef SAA1064_SELFTEST
+  for (b = 0; b < 8; b++) {
+    i = 1 << b;
+    Wire.beginTransmission (SAA1064_ADDR);
+    Wire.send (1);
+    Wire.send (i);  // One segment on
+    Wire.send (i);  // One segment on
+    Wire.send (i);  // One segment on
+    Wire.send (i);  // One segment on
+    Wire.endTransmission ();
+    delay (500);
+  }
+  
+  setleds (1234);
+  delay (500);
+  setleds (4567);
+  delay (500);
+  setleds (7890);
+#endif
+}
+
+
+/* saa1064setdig --- send a single digit to the SAA1064 LED driver */
+
+void saa1064setdig (int dig, int val)
+{
+  Wire.beginTransmission (SAA1064_ADDR);
+  Wire.send (dig + 1);
+  Wire.send (val);
+  Wire.endTransmission ();
+}
+
+
+/* setleds --- display a four-digit decimal number in the LEDs */
+
+void setleds (int val)
+{
+  char digits[8];
+  int i;
+  int d;
+  int segs;
+  
+  snprintf (digits, 8, "%04d", val);
+  
+  for (i = 0; i < 4; i++) {
+    d = digits[i] - '0';
+    
+    segs = Segtab[d];
+    
+    saa1064setdig (i, segs);
+  }
+}
