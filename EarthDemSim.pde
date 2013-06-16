@@ -503,6 +503,9 @@ int missileCollision (void)
     return (0);
   
   y = Missile.y - Earthy;
+
+  if (y > (MAXY - 1))
+    return (0);
   
   switch (EarthMap[y][Missile.x]) {
   case 0:
