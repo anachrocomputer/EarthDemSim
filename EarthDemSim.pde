@@ -328,7 +328,7 @@ int runLevel (void)
       Missile.y++;
       if (missileCollision ()) {
         Missile.y = MAXY;
-        Score += 15;
+        Score += 25;
         setleds (Score);
       }
     }
