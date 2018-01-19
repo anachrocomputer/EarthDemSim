@@ -147,134 +147,134 @@ int Playerx;     // Player X, 0..7
 int Earthy;
 int Score;
 
-void setup (void)
+void setup(void)
 {
   int i;
   
-  Serial.begin (9600);
+  Serial.begin(9600);
   
-  Serial.println ("Earth Demolition Simulator");
-  Serial.println ("Ludum Dare MiniLD #42");
-  Serial.println ("John Honniball, May 2013");
+  Serial.println("Earth Demolition Simulator");
+  Serial.println("Ludum Dare MiniLD #42");
+  Serial.println("John Honniball, May 2013");
 
   // Initialise LED matrix controller chip
-  max7219_begin ();
+  max7219_begin();
   
   // Set up I/O pins for the NES controller
-  pinMode (LATCH_PIN, OUTPUT);
-  pinMode (CLOCK_PIN, OUTPUT);
-  pinMode (DATA_PIN, INPUT);
+  pinMode(LATCH_PIN, OUTPUT);
+  pinMode(CLOCK_PIN, OUTPUT);
+  pinMode(DATA_PIN, INPUT);
   
-  digitalWrite (LATCH_PIN, LOW);
-  digitalWrite (CLOCK_PIN, LOW);
+  digitalWrite(LATCH_PIN, LOW);
+  digitalWrite(CLOCK_PIN, LOW);
   
   // Clear frame buffer and LED matrix (all pixels off)
-  clrFrame ();
+  clrFrame();
   
-  updscreen ();
+  updscreen();
   
-  saa1064_begin ();
+  saa1064_begin();
   
-  setleds (0);
+  setleds(0);
   
   // Wait one second
-  delay (1000);
+  delay(1000);
 }
 
 
-void loop (void)
+void loop(void)
 {
   // Press START
-  waitReady ();
+  waitReady();
   
-  runGame ();
+  runGame();
 }
 
 
 /* waitReady --- wait for the player to be ready and press START */
 
-void waitReady (void)
+void waitReady(void)
 {
   unsigned int nesbits;
   
-  clrFrame ();
+  clrFrame();
   
   // Draw prompt screen
-  setHline (1, 6, 3);
-  setHline (1, 6, 4);
+  setHline(1, 6, 3);
+  setHline(1, 6, 4);
   
-  updscreen ();
+  updscreen();
   
   do {
-    nesbits = readNES ();
+    nesbits = readNES();
     
     // Allow brightness adjustment while waiting for START
     if ((nesbits & NES_N) && (Brightness < 15))
-      max7219write (INTENSITY_REG, ++Brightness);
+      max7219write(INTENSITY_REG, ++Brightness);
     
     if ((nesbits & NES_S) && (Brightness > 0))
-      max7219write (INTENSITY_REG, --Brightness);
+      max7219write(INTENSITY_REG, --Brightness);
     
-    delay (100);
+    delay(100);
   } while ((nesbits & NES_START) == 0);
 }
 
 
 /* runGame --- run a single game to either win or lose */
 
-void runGame (void)
+void runGame(void)
 {
   int ship;
   int won;
   
-  memcpy (EarthMap, Earth8x8, sizeof (EarthMap));  // Refresh Earth
+  memcpy(EarthMap, Earth8x8, sizeof (EarthMap));  // Refresh Earth
   
   Score = 0;
-  setleds (Score);
+  setleds(Score);
   
   for (ship = 3; ship > 0; ship--) {
-    showShips (ship);
+    showShips(ship);
     
-    won = runLevel ();
+    won = runLevel();
     
     if (won)
       break;
     else
-      showLoseShip ();
+      showLoseShip();
   }
   
   if (won)
-    showWin ();
+    showWin();
   else
-    showLose ();
+    showLose();
 }
 
 
 /* showShips --- show player how many ships remain */
 
-void showShips (int ships)
+void showShips(int ships)
 {
   int f, s;
   
   // The ship that is about to play will blink on and off
   for (f = 0; f < 5; f++) {
-    clrFrame ();
+    clrFrame();
     
     for (s = 0; s < ships; s++)
-      drawPlayer (6, s * 3);
+      drawPlayer(6, s * 3);
     
-    updscreen ();
+    updscreen();
   
-    delay (200);
+    delay(200);
     
-    clrFrame ();
+    clrFrame();
     
     for (s = 0; s < (ships - 1); s++)
-      drawPlayer (6, s * 3);
+      drawPlayer(6, s * 3);
     
-    updscreen ();
+    updscreen();
   
-    delay (100);
+    delay(100);
   }
     
 }
@@ -282,7 +282,7 @@ void showShips (int ships)
 
 /* runLevel --- play a single level of the game */
 
-int runLevel (void)
+int runLevel(void)
 {
   int i;
   long int start, now;
@@ -302,34 +302,34 @@ int runLevel (void)
   
   while (playing) {
     // Record timer in milliseconds at start of frame cycle 
-    start = millis ();
+    start = millis();
     
-    drawBackground ();
+    drawBackground();
     
-    drawPlayer (Playerx, 0);
+    drawPlayer(Playerx, 0);
     
-    drawMissile ();
+    drawMissile();
     
-    drawEarth (frame);
+    drawEarth(frame);
         
-    updscreen ();
+    updscreen();
     
-    nesbits = readNES ();
-//  Serial.println (nesbits, HEX);
+    nesbits = readNES();
+//  Serial.println(nesbits, HEX);
 
     if (nesbits & NES_W)
-      goLeft ();
+      goLeft();
       
     if (nesbits & NES_E)
-      goRight ();
+      goRight();
       
     // Move the missile, or fire a new one
     if (Missile.y < MAXY) {
       Missile.y++;
-      if (missileCollision ()) {
+      if (missileCollision()) {
         Missile.y = MAXY;
         Score += 25;
-        setleds (Score);
+        setleds(Score);
       }
     }
     else if (nesbits & (NES_A | NES_B)) { // A or B buttons both fire, for
@@ -337,8 +337,8 @@ int runLevel (void)
       Missile.y = 1;
     }
     
-    if (demolished ()) {
-      Serial.println ("Earth demolished, you win");
+    if (demolished()) {
+      Serial.println("Earth demolished, you win");
       won = 1;
       playing = 0;
     }
@@ -347,37 +347,37 @@ int runLevel (void)
     if ((frame % earthSpeed) == 0)
       Earthy--;
     
-    if (earthCollision ()) {
-      Serial.println ("Your ship struck the Earth!");
+    if (earthCollision()) {
+      Serial.println("Your ship struck the Earth!");
       playing = 0;
     }
 
     // If we allow the Earth to pass by, re-set it
     if (Earthy < -10) {
-      Serial.println ("Earth passed by, re-targeting!");
+      Serial.println("Earth passed by, re-targeting!");
       earthSpeed = (earthSpeed * 4) / 5;
       
       if (earthSpeed < 2)
         earthSpeed = 1;
       
-      turnEarth90 ();
+      turnEarth90();
       Earthy = 8;
     }
         
     frame++;
     
     // Work out timing for this frame
-    now = millis ();
+    now = millis();
     elapsed = now - start;
     
-//    Serial.print (elapsed);
-//    Serial.println ("ms.");
+//    Serial.print(elapsed);
+//    Serial.println("ms.");
     
     if (elapsed < 40)
-      delay (40 - elapsed);
+      delay(40 - elapsed);
   }
   
-  delay (500);
+  delay(500);
   
   return (won);
 }
@@ -385,78 +385,78 @@ int runLevel (void)
 
 /* showWin --- display winning animation */
 
-void showWin (void)
+void showWin(void)
 {
   int x, y;
 
-  clrFrame ();
+  clrFrame();
   
   for (x = 0; x < MAXX; x++) {
     for (y = 0 ; y < MAXY; y++) {
       if (WinIcon[y][x] != 0)
-        setPixel (x, 7 - y);
+        setPixel(x, 7 - y);
     }
   }
   
-  updscreen ();
+  updscreen();
   
-  delay (4000);
+  delay(4000);
 }
 
 
 /* showLose --- display losing animation */
 
-void showLose (void)
+void showLose(void)
 {
   int x, y;
 
-  clrFrame ();
+  clrFrame();
   
   for (x = 0; x < MAXX; x++) {
     for (y = 0 ; y < MAXY; y++) {
       if (LoseIcon[y][x] != 0)
-        setPixel (x, 7 - y);
+        setPixel(x, 7 - y);
     }
   }
   
-  updscreen ();
+  updscreen();
   
-  delay (4000);
+  delay(4000);
 }
 
 
 /* showLoseShip --- display lose-a-ship animation */
 
-void showLoseShip (void)
+void showLoseShip(void)
 {
   int x, y;
   int frame;
 
   for (frame = 1; frame <= 4; frame++) {
-    clrFrame ();
+    clrFrame();
     
     for (x = 0; x < MAXX; x++) {
       for (y = 0 ; y < MAXY; y++) {
         if (ShipIcon[y][x] == frame)
-          setPixel (x, 7 - y);
+          setPixel(x, 7 - y);
       }
     }
     
-    updscreen ();
+    updscreen();
     
-    delay (300);
+    delay(300);
   }
   
-  clrFrame ();
-  updscreen ();
+  clrFrame();
+  updscreen();
   
-  delay (500);
+  delay(500);
 }
 
 
 /* goLeft --- move player left */
 
-void goLeft (void)
+void goLeft(void)
 {
   if (Playerpos > 0)
     Playerpos--;
@@ -467,7 +467,7 @@ void goLeft (void)
 
 /* goRight --- move player right */
 
-void goRight (void)
+void goRight(void)
 {
   if (Playerpos < ((MAXX * 2) - 1))
     Playerpos++;
@@ -478,7 +478,7 @@ void goRight (void)
 
 /* demolished --- return true if the Earth has been entirely demolished */
 
-int demolished (void)
+int demolished(void)
 {
   int x, y;
  
@@ -495,7 +495,7 @@ int demolished (void)
 
 /* missileCollision --- detect collision between missile and Earth */
 
-int missileCollision (void)
+int missileCollision(void)
 {
   int y;
   
@@ -535,7 +535,7 @@ int missileCollision (void)
 
 /* earthCollision --- detect collision between Earth and player */
 
-int earthCollision (void)
+int earthCollision(void)
 {
   int y0, y1;
   
@@ -562,7 +562,7 @@ int earthCollision (void)
 
 /* turnEarth90 --- rotate pixel map for Earth by 90 degrees */
 
-void turnEarth90 (void)
+void turnEarth90(void)
 {
   // We need to rotate 'EarthMap' by 90 degrees, but we don't want to
   // use a temporary 64-byte array. We do it by combining two reflections
@@ -592,7 +592,7 @@ void turnEarth90 (void)
 
 /* readNES --- read the NES controller */
 
-unsigned int readNES (void)
+unsigned int readNES(void)
 {
   // With digitalRead/digitalWrite: 150us
   // With direct port I/O: 24us
@@ -600,40 +600,40 @@ unsigned int readNES (void)
   unsigned int nesbits = 0;
   int i;
   
-//before = micros ();
+//before = micros();
   
 #ifdef SLOW_READNES
-  digitalWrite (LATCH_PIN, HIGH);
-  digitalWrite (LATCH_PIN, LOW);
+  digitalWrite(LATCH_PIN, HIGH);
+  digitalWrite(LATCH_PIN, LOW);
   
   for (i = 0; i < 8; i++) {
-    if (digitalRead (DATA_PIN) == LOW)
+    if (digitalRead(DATA_PIN) == LOW)
       nesbits |= (1 << i);
       
-    digitalWrite (CLOCK_PIN, HIGH);
-    digitalWrite (CLOCK_PIN, LOW);
+    digitalWrite(CLOCK_PIN, HIGH);
+    digitalWrite(CLOCK_PIN, LOW);
   }
 #else
   NESOUT |= LATCH_BIT;
-  delayMicroseconds (1);
+  delayMicroseconds(1);
   NESOUT &= ~LATCH_BIT;
   
   for (i = 0; i < 8; i++) {
-    delayMicroseconds (1);
+    delayMicroseconds(1);
     
     if ((NESIN & DATA_BIT) == 0)
       nesbits |= (1 << i);
       
     NESOUT |= CLOCK_BIT;
-    delayMicroseconds (1);
+    delayMicroseconds(1);
     NESOUT &= ~CLOCK_BIT;
   }
 #endif
   
-//after = micros ();
-//Serial.print ("readNES: ");
-//Serial.print (after - before, DEC);
-//Serial.println ("us");
+//after = micros();
+//Serial.print("readNES: ");
+//Serial.print(after - before, DEC);
+//Serial.println("us");
   
   return (nesbits);
 }
@@ -641,25 +641,25 @@ unsigned int readNES (void)
 
 /* drawBackground --- draw the screen background */
 
-void drawBackground (void)
+void drawBackground(void)
 {
   // TODO: draw a couple of stars
-  clrFrame ();
+  clrFrame();
 }
 
 
 /* drawMissile --- draw the missile (a single pixel) */
 
-void drawMissile (void)
+void drawMissile(void)
 {
   if (Missile.y < MAXY)
-    setPixel (Missile.x, Missile.y);
+    setPixel(Missile.x, Missile.y);
 }
 
 
 /* drawEarth --- draw the Earth approaching from top */
 
-void drawEarth (int frame)
+void drawEarth(int frame)
 {
   int x;
   int ye, ys;
@@ -668,16 +668,16 @@ void drawEarth (int frame)
     return;  // Earth is off-screen
   
   for (x = 0; x < MAXX; x++) {
-    ys = max (Earthy, 0);
-    ye = max (-Earthy, 0);
+    ys = max(Earthy, 0);
+    ye = max(-Earthy, 0);
     for ( ; (ye < MAXY) && (ys < MAXY); ye++, ys++) {
       if (EarthMap[ye][x] != 0) {
         if (EarthMap[ye][x] == 5) {
           if (frame & 1)       // Draw on alternate frames
-            setPixel (x, ys);  // for flicker effect
+            setPixel(x, ys);   // for flicker effect
         }
         else
-          setPixel (x, ys);
+          setPixel(x, ys);
       }
     }
   }
@@ -686,114 +686,114 @@ void drawEarth (int frame)
 
 /* drawPlayer --- draw an inverted T for the player */
 
-void drawPlayer (int x, int y)
+void drawPlayer(int x, int y)
 {
   if (x > 0)
-    setPixel (x - 1, y);
+    setPixel(x - 1, y);
     
-  setPixel (x, y);
-  setPixel (x, y + 1);
+  setPixel(x, y);
+  setPixel(x, y + 1);
   
   if (x < 7)
-    setPixel (x + 1, y);
+    setPixel(x + 1, y);
 }
 
 
 /* clrFrame --- clear the entire frame (all LEDs off) */
 
-void clrFrame (void)
+void clrFrame(void)
 {
-  memset (FrameBuffer, 0, sizeof (FrameBuffer));
+  memset(FrameBuffer, 0, sizeof (FrameBuffer));
 }
 
 
 /* setVline --- draw vertical line */
 
-void setVline (unsigned int x, unsigned int y1, unsigned int y2)
+void setVline(unsigned int x, unsigned int y1, unsigned int y2)
 {
   unsigned int y;
   
   for (y = y1; y <= y2; y++)
-    setPixel (x, y);
+    setPixel(x, y);
 }
 
 
 /* clrVline --- draw vertical line */
 
-void clrVline (unsigned int x, unsigned int y1, unsigned int y2)
+void clrVline(unsigned int x, unsigned int y1, unsigned int y2)
 {
   unsigned int y;
   
   for (y = y1; y <= y2; y++)
-    clrPixel (x, y);
+    clrPixel(x, y);
 }
 
 
 /* setHline --- set pixels in a horizontal line */
 
-void setHline (unsigned int x1, unsigned int x2, unsigned int y)
+void setHline(unsigned int x1, unsigned int x2, unsigned int y)
 {
   unsigned int x;
   
   for (x = x1; x <= x2; x++)
-    setPixel (x, y);
+    setPixel(x, y);
 }
 
 
 /* clrHline --- clear pixels in a horizontal line */
 
-void clrHline (unsigned int x1, unsigned int x2, unsigned int y)
+void clrHline(unsigned int x1, unsigned int x2, unsigned int y)
 {
   unsigned int x;
 
   if (y < MAXY) {
     for (x = x1; x <= x2; x++)
-      clrPixel (x, y);
+      clrPixel(x, y);
   }
 }
 
 
 /* setRect --- set pixels in a (non-filled) rectangle */
 
-void setRect (int x1, int y1, int x2, int y2)
+void setRect(int x1, int y1, int x2, int y2)
 {
-  setHline (x1, x2, y1);
-  setVline (x2, y1, y2);
-  setHline (x1, x2, y2);
-  setVline (x1, y1, y2);
+  setHline(x1, x2, y1);
+  setVline(x2, y1, y2);
+  setHline(x1, x2, y2);
+  setVline(x1, y1, y2);
 }
 
 
 /* fillRect --- set pixels in a filled rectangle */
 
-void fillRect (int x1, int y1, int x2, int y2, int ec, int fc)
+void fillRect(int x1, int y1, int x2, int y2, int ec, int fc)
 {
   int y;
   
   for (y = y1; y <= y2; y++)
     if (fc == 0)
-      clrHline (x1, x2, y);
+      clrHline(x1, x2, y);
     else if (fc == 1)
-      setHline (x1, x2, y);
+      setHline(x1, x2, y);
   
   if (ec == 1) {
-    setHline (x1, x2, y1);
-    setVline (x2, y1, y2);
-    setHline (x1, x2, y2);
-    setVline (x1, y1, y2);
+    setHline(x1, x2, y1);
+    setVline(x2, y1, y2);
+    setHline(x1, x2, y2);
+    setVline(x1, y1, y2);
   }
   else if (ec == 0) {
-    clrHline (x1, x2, y1);
-    clrVline (x2, y1, y2);
-    clrHline (x1, x2, y2);
-    clrVline (x1, y1, y2);
+    clrHline(x1, x2, y1);
+    clrVline(x2, y1, y2);
+    clrHline(x1, x2, y2);
+    clrVline(x1, y1, y2);
   }
 }
 
 
 /* setPixel --- set a single pixel in the frame buffer */
 
-void setPixel (int x, int y)
+void setPixel(int x, int y)
 {
   FrameBuffer[y] |= (1 << x);
 }
@@ -801,7 +801,7 @@ void setPixel (int x, int y)
 
 /* clrPixel --- clear a single pixel in the frame buffer */
 
-void clrPixel (int x, int y)
+void clrPixel(int x, int y)
 {
   FrameBuffer[y] &= ~(1 << x);
 }
@@ -809,152 +809,152 @@ void clrPixel (int x, int y)
 
 /* updscreen --- update the physical screen from the frame buffer */
 
-void updscreen (void)
+void updscreen(void)
 {
 // About 40us on 16MHz Arduino
 //  unsigned long int before, after;
   int r;
   
-//  before = micros ();
+//  before = micros();
   
   for (r = 0; r < MAXY; r++) {
-    max7219write (r + 1, FrameBuffer[r]);
+    max7219write(r + 1, FrameBuffer[r]);
   }
 
-//  after = micros ();
+//  after = micros();
   
-//  Serial.print (after - before);
-//  Serial.println ("us updscreen");
+//  Serial.print(after - before);
+//  Serial.println("us updscreen");
 }
 
 
 /* max7219_begin --- initialise the MAX219 LED driver */
 
-void max7219_begin (void)
+void max7219_begin(void)
 {
   int i;
 
   /* Configure I/O pins on Arduino */
-  pinMode (slaveSelectPin, OUTPUT);
-  pinMode (SDAPin, OUTPUT);
-  pinMode (SCLKPin, OUTPUT);
+  pinMode(slaveSelectPin, OUTPUT);
+  pinMode(SDAPin, OUTPUT);
+  pinMode(SCLKPin, OUTPUT);
   
-  digitalWrite (slaveSelectPin, HIGH);
-  digitalWrite (SDAPin, HIGH);
-  digitalWrite (SCLKPin, HIGH);
+  digitalWrite(slaveSelectPin, HIGH);
+  digitalWrite(SDAPin, HIGH);
+  digitalWrite(SCLKPin, HIGH);
 
-  SPI.begin ();
+  SPI.begin();
   // The following line fails on arduino-0021 due to a bug in the SPI library
   // Compile with arduino-0022 or later
-  SPI.setClockDivider (SPI_CLOCK_DIV2);
-  SPI.setBitOrder (MSBFIRST);
-  SPI.setDataMode (SPI_MODE0);
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE0);
   
   /* Start configuring the MAX7219 LED controller */
-  max7219write (DISPLAYTEST_REG, 0); // Switch off display test mode
+  max7219write(DISPLAYTEST_REG, 0); // Switch off display test mode
   
-  max7219write (SHUTDOWN_REG, 1);   // Exit shutdown
+  max7219write(SHUTDOWN_REG, 1);    // Exit shutdown
 
-  max7219write (INTENSITY_REG, 7);  // Brightness half
+  max7219write(INTENSITY_REG, 7);   // Brightness half
 
-  max7219write (DECODEMODE_REG, 0); // No decoding; we don't have a 7-seg display
+  max7219write(DECODEMODE_REG, 0);  // No decoding; we don't have a 7-seg display
 
-  max7219write (SCANLIMIT_REG, 7);  // Scan limit 7 to scan entire display
+  max7219write(SCANLIMIT_REG, 7);   // Scan limit 7 to scan entire display
 
   for (i = 0; i < 8; i++) {
-    max7219write (i + 1, 0);
+    max7219write(i + 1, 0);
   }
 }
 
 
 /* max7219write16 --- write a 16-bit command word to the MAX7219 */
 
-void max7219write16 (unsigned int i)
+void max7219write16(unsigned int i)
 {
 // Use direct port I/O and hardware SPI for speed
 
-  LEDOUT &= ~CS;    //  digitalWrite (slaveSelectPin, LOW);
-  SPI.transfer (i >> 8);
-  SPI.transfer (i & 0xff);
-  LEDOUT |= CS;     //  digitalWrite (slaveSelectPin, HIGH);
+  LEDOUT &= ~CS;    //  digitalWrite(slaveSelectPin, LOW);
+  SPI.transfer(i >> 8);
+  SPI.transfer(i & 0xff);
+  LEDOUT |= CS;     //  digitalWrite(slaveSelectPin, HIGH);
 }
 
 
 /* max7219write --- write a command to the MAX7219 */
 
-void max7219write (unsigned char reg, unsigned char val)
+void max7219write(unsigned char reg, unsigned char val)
 {
 // Use direct port I/O and hardware SPI for speed
 
-  LEDOUT &= ~CS;    //  digitalWrite (slaveSelectPin, LOW);
-  SPI.transfer (reg);
-  SPI.transfer (val);
-  LEDOUT |= CS;     //  digitalWrite (slaveSelectPin, HIGH);
+  LEDOUT &= ~CS;    //  digitalWrite(slaveSelectPin, LOW);
+  SPI.transfer(reg);
+  SPI.transfer(val);
+  LEDOUT |= CS;     //  digitalWrite(slaveSelectPin, HIGH);
 }
 
 
 /* saa1064_begin --- set up the SAA1064 I2C LED driver */
 
-void saa1064_begin (void)
+void saa1064_begin(void)
 {
   int i, b;
   
-  Wire.begin ();
+  Wire.begin();
   
-  Wire.beginTransmission (SAA1064_ADDR);
-  Wire.write (0);
-  Wire.write (0x67);  // Mux mode, digits unblanked
-  Wire.endTransmission ();
+  Wire.beginTransmission(SAA1064_ADDR);
+  Wire.write(0);
+  Wire.write(0x67);  // Mux mode, digits unblanked
+  Wire.endTransmission();
   
 #ifdef SAA1064_SELFTEST
   for (b = 0; b < 8; b++) {
     i = 1 << b;
-    Wire.beginTransmission (SAA1064_ADDR);
-    Wire.write (1);
-    Wire.write (i);  // One segment on
-    Wire.write (i);  // One segment on
-    Wire.write (i);  // One segment on
-    Wire.write (i);  // One segment on
-    Wire.endTransmission ();
-    delay (500);
+    Wire.beginTransmission(SAA1064_ADDR);
+    Wire.write(1);
+    Wire.write(i);  // One segment on
+    Wire.write(i);  // One segment on
+    Wire.write(i);  // One segment on
+    Wire.write(i);  // One segment on
+    Wire.endTransmission();
+    delay(500);
   }
   
-  setleds (1234);
-  delay (500);
-  setleds (4567);
-  delay (500);
-  setleds (7890);
+  setleds(1234);
+  delay(500);
+  setleds(4567);
+  delay(500);
+  setleds(7890);
 #endif
 }
 
 
 /* saa1064setdig --- send a single digit to the SAA1064 LED driver */
 
-void saa1064setdig (int dig, int val)
+void saa1064setdig(int dig, int val)
 {
-  Wire.beginTransmission (SAA1064_ADDR);
-  Wire.write (dig + 1);
-  Wire.write (val);
-  Wire.endTransmission ();
+  Wire.beginTransmission(SAA1064_ADDR);
+  Wire.write(dig + 1);
+  Wire.write(val);
+  Wire.endTransmission();
 }
 
 
 /* setleds --- display a four-digit decimal number in the LEDs */
 
-void setleds (int val)
+void setleds(int val)
 {
   char digits[8];
   int i;
   int d;
   int segs;
   
-  snprintf (digits, 8, "%04d", val);
+  snprintf(digits, 8, "%04d", val);
   
   for (i = 0; i < 4; i++) {
     d = digits[i] - '0';
     
     segs = Segtab[d];
     
-    saa1064setdig (i, segs);
+    saa1064setdig(i, segs);
   }
 }
