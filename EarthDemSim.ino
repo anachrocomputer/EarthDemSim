@@ -902,19 +902,19 @@ void saa1064_begin (void)
   Wire.begin ();
   
   Wire.beginTransmission (SAA1064_ADDR);
-  Wire.send (0);
-  Wire.send (0x67);  // Mux mode, digits unblanked
+  Wire.write (0);
+  Wire.write (0x67);  // Mux mode, digits unblanked
   Wire.endTransmission ();
   
 #ifdef SAA1064_SELFTEST
   for (b = 0; b < 8; b++) {
     i = 1 << b;
     Wire.beginTransmission (SAA1064_ADDR);
-    Wire.send (1);
-    Wire.send (i);  // One segment on
-    Wire.send (i);  // One segment on
-    Wire.send (i);  // One segment on
-    Wire.send (i);  // One segment on
+    Wire.write (1);
+    Wire.write (i);  // One segment on
+    Wire.write (i);  // One segment on
+    Wire.write (i);  // One segment on
+    Wire.write (i);  // One segment on
     Wire.endTransmission ();
     delay (500);
   }
@@ -933,8 +933,8 @@ void saa1064_begin (void)
 void saa1064setdig (int dig, int val)
 {
   Wire.beginTransmission (SAA1064_ADDR);
-  Wire.send (dig + 1);
-  Wire.send (val);
+  Wire.write (dig + 1);
+  Wire.write (val);
   Wire.endTransmission ();
 }
 
