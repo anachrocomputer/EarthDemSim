@@ -18,3 +18,7 @@ is the original code that I wrote for the MiniLD42 contest on Ludum
 Dare. "master" is an updated branch that includes improvements that
 I've added after the game deadline. I'm still adding new stuff to the
 "master" branch.
+
+UPDATE January 2018
+Changes to support V1.00 and newer Arduino IDE
+Changes to coding standards
