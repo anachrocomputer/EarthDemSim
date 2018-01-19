@@ -274,7 +274,6 @@ void showShips(int ships)
   
     delay(100);
   }
-    
 }
 
 
@@ -282,11 +281,8 @@ void showShips(int ships)
 
 int runLevel(void)
 {
-  long int start, now;
-  int elapsed;
   int playing = true;
   int frame = 0;
-  unsigned int nesbits;
   int earthSpeed;
   int won = 0;
   
@@ -299,7 +295,7 @@ int runLevel(void)
   
   while (playing) {
     // Record timer in milliseconds at start of frame cycle 
-    start = millis();
+    const long int start = millis();
     
     drawBackground();
     
@@ -311,7 +307,7 @@ int runLevel(void)
         
     updscreen();
     
-    nesbits = readNES();
+    const unsigned int nesbits = readNES();
 //  Serial.println(nesbits, HEX);
 
     if (nesbits & NES_W)
@@ -364,8 +360,8 @@ int runLevel(void)
     frame++;
     
     // Work out timing for this frame
-    now = millis();
-    elapsed = now - start;
+    const long int now = millis();
+    const int elapsed = now - start;
     
 //    Serial.print(elapsed);
 //    Serial.println("ms.");
@@ -656,17 +652,17 @@ void drawMissile(void)
 
 /* drawEarth --- draw the Earth approaching from top */
 
-void drawEarth(int frame)
+void drawEarth(const int frame)
 {
   int x;
-  int ye, ys;
   
   if ((Earthy > 7) || (Earthy < -7))
     return;  // Earth is off-screen
   
   for (x = 0; x < MAXX; x++) {
-    ys = max(Earthy, 0);
-    ye = max(-Earthy, 0);
+    int ys = max(Earthy, 0);
+    int ye = max(-Earthy, 0);
+
     for ( ; (ye < MAXY) && (ys < MAXY); ye++, ys++) {
       if (EarthMap[ye][x] != 0) {
         if (EarthMap[ye][x] == 5) {
@@ -683,7 +679,7 @@ void drawEarth(int frame)
 
 /* drawPlayer --- draw an inverted T for the player */
 
-void drawPlayer(int x, int y)
+void drawPlayer(const int x, const int y)
 {
   if (x > 0)
     setPixel(x - 1, y);
@@ -706,7 +702,7 @@ void clrFrame(void)
 
 /* setVline --- draw vertical line */
 
-void setVline(unsigned int x, unsigned int y1, unsigned int y2)
+void setVline(const unsigned int x, const unsigned int y1, const unsigned int y2)
 {
   unsigned int y;
   
@@ -717,7 +713,7 @@ void setVline(unsigned int x, unsigned int y1, unsigned int y2)
 
 /* clrVline --- draw vertical line */
 
-void clrVline(unsigned int x, unsigned int y1, unsigned int y2)
+void clrVline(const unsigned int x, const unsigned int y1, const unsigned int y2)
 {
   unsigned int y;
   
@@ -728,7 +724,7 @@ void clrVline(unsigned int x, unsigned int y1, unsigned int y2)
 
 /* setHline --- set pixels in a horizontal line */
 
-void setHline(unsigned int x1, unsigned int x2, unsigned int y)
+void setHline(const unsigned int x1, const unsigned int x2, const unsigned int y)
 {
   unsigned int x;
   
@@ -739,7 +735,7 @@ void setHline(unsigned int x1, unsigned int x2, unsigned int y)
 
 /* clrHline --- clear pixels in a horizontal line */
 
-void clrHline(unsigned int x1, unsigned int x2, unsigned int y)
+void clrHline(const unsigned int x1, const unsigned int x2, const unsigned int y)
 {
   unsigned int x;
 
@@ -752,7 +748,7 @@ void clrHline(unsigned int x1, unsigned int x2, unsigned int y)
 
 /* setRect --- set pixels in a (non-filled) rectangle */
 
-void setRect(int x1, int y1, int x2, int y2)
+void setRect(const int x1, const int y1, const int x2, const int y2)
 {
   setHline(x1, x2, y1);
   setVline(x2, y1, y2);
@@ -763,7 +759,7 @@ void setRect(int x1, int y1, int x2, int y2)
 
 /* fillRect --- set pixels in a filled rectangle */
 
-void fillRect(int x1, int y1, int x2, int y2, int ec, int fc)
+void fillRect(const int x1, const int y1, const int x2, const int y2, const int ec, const int fc)
 {
   int y;
   
@@ -790,7 +786,7 @@ void fillRect(int x1, int y1, int x2, int y2, int ec, int fc)
 
 /* setPixel --- set a single pixel in the frame buffer */
 
-void setPixel(int x, int y)
+void setPixel(const int x, const int y)
 {
   FrameBuffer[y] |= (1 << x);
 }
@@ -798,7 +794,7 @@ void setPixel(int x, int y)
 
 /* clrPixel --- clear a single pixel in the frame buffer */
 
-void clrPixel(int x, int y)
+void clrPixel(const int x, const int y)
 {
   FrameBuffer[y] &= ~(1 << x);
 }
@@ -866,7 +862,7 @@ void max7219_begin(void)
 
 /* max7219write16 --- write a 16-bit command word to the MAX7219 */
 
-void max7219write16(unsigned int i)
+void max7219write16(const unsigned int i)
 {
 // Use direct port I/O and hardware SPI for speed
 
@@ -879,7 +875,7 @@ void max7219write16(unsigned int i)
 
 /* max7219write --- write a command to the MAX7219 */
 
-void max7219write(unsigned char reg, unsigned char val)
+void max7219write(const unsigned char reg, const unsigned char val)
 {
 // Use direct port I/O and hardware SPI for speed
 
@@ -929,7 +925,7 @@ void saa1064_begin(void)
 
 /* saa1064setdig --- send a single digit to the SAA1064 LED driver */
 
-void saa1064setdig(int dig, int val)
+void saa1064setdig(const int dig, const int val)
 {
   Wire.beginTransmission(SAA1064_ADDR);
   Wire.write(dig + 1);
@@ -940,19 +936,17 @@ void saa1064setdig(int dig, int val)
 
 /* setleds --- display a four-digit decimal number in the LEDs */
 
-void setleds(int val)
+void setleds(const int val)
 {
   char digits[8];
   int i;
-  int d;
-  int segs;
   
-  snprintf(digits, 8, "%04d", val);
+  snprintf(digits, sizeof (digits), "%04d", val);
   
   for (i = 0; i < 4; i++) {
-    d = digits[i] - '0';
+    const int d = digits[i] - '0';
     
-    segs = Segtab[d];
+    const unsigned int segs = Segtab[d];
     
     saa1064setdig(i, segs);
   }
