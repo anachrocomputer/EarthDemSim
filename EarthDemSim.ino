@@ -149,8 +149,6 @@ int Score;
 
 void setup(void)
 {
-  int i;
-  
   Serial.begin(9600);
   
   Serial.println("Earth Demolition Simulator");
@@ -284,7 +282,6 @@ void showShips(int ships)
 
 int runLevel(void)
 {
-  int i;
   long int start, now;
   int elapsed;
   int playing = true;
@@ -897,7 +894,9 @@ void max7219write(unsigned char reg, unsigned char val)
 
 void saa1064_begin(void)
 {
+#ifdef SAA1064_SELFTEST
   int i, b;
+#endif
   
   Wire.begin();
   
