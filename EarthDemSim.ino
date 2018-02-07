@@ -4,7 +4,11 @@
 /* Released under the GNU Public Licence (GPL) */
 
 #include <SPI.h>
+#ifdef OLD_SCORE_DISPLAY
 #include <Wire.h>
+#else
+#include <TM1637Display.h>
+#endif
 
 // Direct port I/O defines for Arduino with ATmega328
 // Change these if running on Mega Arduino
@@ -31,8 +35,14 @@
 #define SDAPin 11          // DIN pin
 #define SCLKPin 13         // CLK pin
 
+#ifdef OLD_SCORE_DISPLAY
 // I2C address of SAA1064 LED driver chip
 #define SAA1064_ADDR (56)
+#else
+// I/O pins for TM1637 connection
+#define TM1637_CLOCK_PIN  5
+#define TM1637_DATA_PIN   6
+#endif
 
 // Bits returned by 'readNES':
 #define NES_A        1
@@ -147,6 +157,10 @@ int Playerx;     // Player X, 0..7
 int Earthy;
 int Score;
 
+#ifndef OLD_SCORE_DISPLAY
+TM1637Display ScoreDisplay(TM1637_CLOCK_PIN, TM1637_DATA_PIN);
+#endif
+
 void setup(void)
 {
   Serial.begin(9600);
@@ -170,13 +184,22 @@ void setup(void)
   clrFrame();
   
   updscreen();
-  
+
+#ifdef OLD_SCORE_DISPLAY
   saa1064_begin();
-  
-  setleds(0);
-  
+#else
+  ScoreDisplay.setBrightness(Brightness / 2, false);
+  ScoreDisplay.showNumberDec(0);
+#endif
+
   // Wait one second
   delay(1000);
+
+#ifndef OLD_SCORE_DISPLAY
+  ScoreDisplay.setBrightness(Brightness / 2, true);
+#endif
+
+  setleds(0);
 }
 
 
@@ -207,11 +230,19 @@ void waitReady(void)
     nesbits = readNES();
     
     // Allow brightness adjustment while waiting for START
-    if ((nesbits & NES_N) && (Brightness < 15))
-      max7219write(INTENSITY_REG, ++Brightness);
+    if ((nesbits & NES_N) && (Brightness < 15)) {
+      ++Brightness;
+      max7219write(INTENSITY_REG, Brightness);
+      ScoreDisplay.setBrightness(Brightness / 2);
+      setleds(Score);
+    }
     
-    if ((nesbits & NES_S) && (Brightness > 0))
-      max7219write(INTENSITY_REG, --Brightness);
+    if ((nesbits & NES_S) && (Brightness > 0)) {
+      --Brightness;
+      max7219write(INTENSITY_REG, Brightness);
+      ScoreDisplay.setBrightness(Brightness / 2);
+      setleds(Score);
+    }
     
     delay(100);
   } while ((nesbits & NES_START) == 0);
@@ -886,6 +917,7 @@ void max7219write(const unsigned char reg, const unsigned char val)
 }
 
 
+#ifdef OLD_SCORE_DISPLAY
 /* saa1064_begin --- set up the SAA1064 I2C LED driver */
 
 void saa1064_begin(void)
@@ -932,12 +964,14 @@ void saa1064setdig(const int dig, const int val)
   Wire.write(val);
   Wire.endTransmission();
 }
+#endif
 
 
 /* setleds --- display a four-digit decimal number in the LEDs */
 
 void setleds(const int val)
 {
+#ifdef OLD_SCORE_DISPLAY
   char digits[8];
   int i;
   
@@ -950,4 +984,7 @@ void setleds(const int val)
     
     saa1064setdig(i, segs);
   }
+#else
+  ScoreDisplay.showNumberDec(val);
+#endif
 }
