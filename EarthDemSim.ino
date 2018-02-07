@@ -608,17 +608,17 @@ unsigned int readNES(void)
   }
 #else
   NESOUT |= LATCH_BIT;
-  delayMicroseconds(1);
+  delayMicroseconds(2);
   NESOUT &= ~LATCH_BIT;
   
   for (i = 0; i < 8; i++) {
-    delayMicroseconds(1);
+    delayMicroseconds(2);
     
     if ((NESIN & DATA_BIT) == 0)
       nesbits |= (1 << i);
       
     NESOUT |= CLOCK_BIT;
-    delayMicroseconds(1);
+    delayMicroseconds(2);
     NESOUT &= ~CLOCK_BIT;
   }
 #endif
