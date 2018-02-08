@@ -123,6 +123,7 @@ unsigned char LoseIcon[8][8] = {
   {0, 0, 1, 1, 1, 1, 0, 0}
 };
 
+#ifdef OLD_SCORE_DISPLAY
 #define A (1 << 0)
 #define B (1 << 1)
 #define C (1 << 2)
@@ -145,6 +146,7 @@ unsigned char Segtab[10] = {
   A | B | C | D | E | F | G, // 8
   B | C | D | E | F | G      // 9
 };
+#endif
 
 
 struct {
