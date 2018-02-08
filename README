@@ -22,3 +22,12 @@ I've added after the game deadline. I'm still adding new stuff to the
 UPDATE January 2018
 Changes to support V1.00 and newer Arduino IDE
 Changes to coding standards
+
+UPDATE February 2018
+Slowed down NES controller reading code slightly to cure problems when
+running on Arduino Nano clone board.
+
+Removed obsolete SAA1064 (I2C) score display and replaced it with a
+four-digit TM1637 display module. Code now requires the TM1637 library
+and header file. Scoring system unchanged, so a winning game scores
+1500 points. Game still runs without TM1637 connected to Arduino.
