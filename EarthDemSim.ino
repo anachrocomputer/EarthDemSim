@@ -233,15 +233,19 @@ void waitReady(void)
     if ((nesbits & NES_N) && (Brightness < 15)) {
       ++Brightness;
       max7219write(INTENSITY_REG, Brightness);
+#ifndef OLD_SCORE_DISPLAY
       ScoreDisplay.setBrightness(Brightness / 2);
       setleds(Score);
+#endif
     }
     
     if ((nesbits & NES_S) && (Brightness > 0)) {
       --Brightness;
       max7219write(INTENSITY_REG, Brightness);
+#ifndef OLD_SCORE_DISPLAY
       ScoreDisplay.setBrightness(Brightness / 2);
       setleds(Score);
+#endif
     }
     
     delay(100);
