@@ -27,10 +27,13 @@ I've added after the game deadline.
 I'm still adding new stuff to the "main" branch.
 
 ## UPDATE January 2018 ##
+
 Changes to support V1.00 and newer Arduino IDE
+
 Changes to coding standards
 
 ## UPDATE February 2018 ##
+
 Slowed down NES controller reading code slightly to cure problems when
 running on Arduino Nano clone board.
 
