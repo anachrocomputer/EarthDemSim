@@ -1,3 +1,8 @@
+![Static Badge](https://img.shields.io/badge/MCU-ATmega328-green "MCU:ATmega328")
+![Static Badge](https://img.shields.io/badge/BOARD-Arduino-green "BOARD:Arduino")
+![Static Badge](https://img.shields.io/badge/DISPLAY-MAX7219-green "DISPLAY:MAX7219")
+![Static Badge](https://img.shields.io/badge/MiniLD-42-green "MiniLD:42")
+
 # Earth Demolition Simulator #
 
 This is the source code for EarthDemSim, a game for the Arduino.
@@ -8,11 +13,15 @@ There's no sound (yet).
 Pin connections between Arduino,
 display, and controller are shown in the source code comments.
 
+I also wrote about the game on my blog:
+
+http://anachrocomputer.blogspot.com/2013/06/another-tiny-game-on-arduino.html
+
 ## Ludum Dare ##
 
 I wrote this game for Ludum Dare's MiniLD #42: 
 
-http://www.ludumdare.com/compo/2013/05/18/mini-ludum-dare-42-announcement/
+https://web.archive.org/web/20180718170610/http://www.ludumdare.com/compo/2013/05/18/mini-ludum-dare-42-announcement/
 
 The game is an Earth Demolition Simulator,
 wherein the player shoots at the Earth from a spaceship.
@@ -25,6 +34,10 @@ contest on Ludum Dare.
 "main" is an updated branch that includes improvements that
 I've added after the game deadline.
 I'm still adding new stuff to the "main" branch.
+
+## Screenshot ##
+
+![Earth Demolition Simulator](game1.jpg "Earth Demolition Simulator")
 
 ## UPDATE January 2018 ##
 
